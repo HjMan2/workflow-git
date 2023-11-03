@@ -3,7 +3,7 @@ name: validate pull request commit message
 on:
   pull_request:
     types:
-      - closed
+      - synchronize
 
 jobs:
   validate:
