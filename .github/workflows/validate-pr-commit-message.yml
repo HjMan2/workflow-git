@@ -12,9 +12,11 @@ jobs:
 
     steps:
       - name: Check Squashed Commit Message
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          
         run: |
           # Fetch the pull request and checkout the merge commit
-          PR_NUMBER="${{ github.event.pull_request.number }}"
           git fetch origin pull/${{ PR_NUMBER }}/merge:pr-${{ PR_NUMBER }}
           git checkout pr-${{ PR_NUMBER }}
           
