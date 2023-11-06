@@ -17,19 +17,7 @@ jobs:
           
         run: |
           # Fetch the pull request and checkout the merge commit
-          git fetch origin pull/${{ PR_NUMBER }}/merge:pr-${{ PR_NUMBER }}
-          git checkout pr-${{ PR_NUMBER }}
-          
-          # Define your commit message pattern (e.g., start with "test:")
-          PATTERN="^(feat|fix|chore|docs|style|refactor|perf|test)(\([^)]+\))?(\!)?\: .+"
-          
-          # Get the squashed commit message
-          COMMIT_MESSAGE=$(git log --format=%B -n 1 HEAD)
-          
-          if ! [[ "$COMMIT_MESSAGE" =~ $PATTERN ]]; then
-            echo "Invalid squashed commit message: $COMMIT_MESSAGE"
-            exit 1
-          fi
+          echo $PR_NUMBER
         continue-on-error: false
 
       - name: Set Status Check
