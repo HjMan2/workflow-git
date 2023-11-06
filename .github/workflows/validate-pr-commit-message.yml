@@ -1,40 +1,37 @@
-name: validate pull request commit message
-
-on:
-  pull_request:
-    types:
-      - synchronize
-      - closed
-
+The following is a simple demo as reference:
+on: pull_request
 jobs:
-  validate:
-    runs-on: ubuntu-latest
+job1:
+name: Test
+if: ${{ github.event_name == 'pull_request' }}
+runs-on: ubuntu-latest
+steps:
+- name: List commits on the pull request
+run: |
+response=$(curl --request GET 
+--url 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits' 
+--header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' 
+--header 'Accept: application/vnd.github.v3+json' 
+--header 'Content-Type: application/json')
 
-    steps:
-      - name: Check Squashed Commit Message
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          
-        run: |
-          msg=$(git log -1 --format=%s --pretty=%B)
-          echo msg
-          # Fetch the pull request and checkout the merge commit
-          git fetch origin pull/${PR_NUMBER}/merge:pr-${PR_NUMBER}
-          git checkout pr-${PR_NUMBER}
 
-          # Define your commit message pattern (e.g., start with "test:")
-          PATTERN="^(feat|fix|chore|docs|style|refactor|perf|test)(\([^)]+\))?(\!)?\: .+"
-          
-          # Get the squashed commit message
-          COMMIT_MESSAGE=$(git log --format=%B -n 1 HEAD)
-          
-          if ! [[ "$COMMIT_MESSAGE" =~ $PATTERN ]]; then
-            echo "Invalid squashed commit message: $COMMIT_MESSAGE"
-            exit 1
-          fi
+      echo $response &gt; response.json
 
-        continue-on-error: false
+  - name: Get latest commit
+    run: |
+      echo "Get length of the array:"
+      length=$(jq 'length' response.json)
 
-      - name: Set Status Check
-        if: failure()
-        run: echo "Invalid squashed commit message" && exit 1
+      echo "Get index of the latest commit:"
+      index=$(($length - 1))
+
+      echo "Get context of the latest commit:"
+      latest_commit=$(jq --argjson index $index '.[$index]' response.json)
+      echo "$latest_commit"
+
+      echo "Get commit message of the latest commit:"
+      latest_commit_message=$(echo "$latest_commit" | jq -r '.commit.message')
+      echo "$latest_commit_message"
+
+      echo "Get commit SHA of the latest commit:"
+      latest_commit_sha=$(echo "$lates
