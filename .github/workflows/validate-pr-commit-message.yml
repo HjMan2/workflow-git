@@ -16,6 +16,8 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           
         run: |
+          msg=$(git log -1 --format=%s --pretty=%B)
+          echo msg
           # Fetch the pull request and checkout the merge commit
           git fetch origin pull/${PR_NUMBER}/merge:pr-${PR_NUMBER}
           git checkout pr-${PR_NUMBER}
