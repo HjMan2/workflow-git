@@ -1,4 +1,3 @@
-The following is a simple demo as reference:
 on: pull_request
 jobs:
 job1:
