@@ -1,4 +1,5 @@
 name: validate-pr-commit-message
+
 on:
   pull_request:
     types:
@@ -9,18 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
       - name: Get Commit Messages
         run: |
-          # Determine the base and head commit SHAs
-          PR_BASE=$(git merge-base origin/main HEAD)
-          PR_HEAD=${{ github.sha }}
+          # Get the pull request number
+          PR_NUMBER=${{ github.event.number }}
           
-          # Fetch the commit messages between base and head of the pull request
-          COMMIT_MESSAGES=$(git log --pretty=%s ${PR_BASE}..${PR_HEAD})
+          # Fetch the commit messages using the GitHub API
+          COMMIT_MESSAGES=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}/commits" | jq -r '.[].commit.message')
           
           # Print commit messages
           echo "Commit Messages:"
           echo "$COMMIT_MESSAGES"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
