@@ -14,7 +14,8 @@ jobs:
 
       - name: Get Commit Messages
         run: |
-          PR_BASE=${{ github.event.before }}
+          # Determine the base and head commit SHAs
+          PR_BASE=$(git merge-base origin/main HEAD)
           PR_HEAD=${{ github.sha }}
           
           # Fetch the commit messages between base and head of the pull request
